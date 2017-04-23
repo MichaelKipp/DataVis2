@@ -10,8 +10,6 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
 d3.csv('challenger.csv', function(csvData) {
     data = csvData;
     
-    
-    
     svg = d3.select('#pointsSVG').append('svg:svg')
         .attr('width', w)
         .attr('height', h);
@@ -20,9 +18,9 @@ d3.csv('challenger.csv', function(csvData) {
         yVal = vals[i];
         
          yScale = d3.scale.linear()
-				.domain([d3.min(data, function(d) { return parseFloat(d[yVal]); })-1,
+             .domain([d3.min(data, function(d) { return parseFloat(d[yVal]); })-1,
 						 d3.max(data, function(d) { return parseFloat(d[yVal]); })+1])
-				.range([h - xOffset - margin, margin]);
+             .range([h - xOffset - margin, margin]);
         
         yAxis = d3.svg.axis()
             .scale(yScale)
@@ -37,114 +35,68 @@ d3.csv('challenger.csv', function(csvData) {
             .call(yAxis);
         
         yLabel = svg.append('text')
-				.attr('class','label')
-				.attr('x', 50 + spacing * i)
-				.attr('y', h - 10)
-				.text(vals[i]);
+            .attr('class','label')
+            .attr('x', 50 + spacing * i)
+            .attr('y', h - 10)
+            .text(vals[i]);
         }
-        
+    
         var circle = svg.selectAll('circle')
             .data(data);
         for (j = 0; j < 4; j++){
             
             yyVal = vals[j];
             
-             yScale = d3.scale.linear()
-				.domain([d3.min(data, function(d) { return parseFloat(d[yyVal]); })-1,
+            yScale = d3.scale.linear()
+                .domain([d3.min(data, function(d) { return parseFloat(d[yyVal]); })-1,
 						 d3.max(data, function(d) { return parseFloat(d[yyVal]); })+1])
 				.range([h - xOffset - margin, margin]);
-            
             
             circle.enter()
             .append('svg:circle')
             .attr('cy', function(d) {return yScale(d[yyVal]);})
             .attr('cx', function(d) {return 50 + spacing * j;})
-            .attr('r', .5)
+            .attr('r', 0)
             .attr('class', function(d) { return "a" + d['Flight Index'];})
             .style('fill', '#000000');
-                
+        }
         
-        
-    }
+        var lineFunction = d3.svg.line()
+            .x(function(d) { return d.x; })
+            .y(function(d) { return d.y; })
+            .interpolate("linear");
+           
+        var clicked = new Array(23);
+    
+        for (j = 1; j < 24; j ++) {
+            circ = d3.selectAll('circle').filter('.a' + j);
+            console.log(circ);
+            carr = circ.pop();
+            var points = new Array(4);
+            
+            for (i = 0; i < 4; i ++){
+                points[i] = { "x": carr[i].getAttribute('cx'), "y": carr[i].getAttribute('cy')};
+            }
+            
+            var lineGraph = svg.append("path")
+                .attr("d", lineFunction(points))
+                .attr("clicked", "false")
+                .attr("stroke", 'black')
+                .attr('stroke-opacity', .5)
+                .attr("stroke-width", 2)
+                .attr("fill", "none")
+                .on('click', function(d) {
+                    console.log("boop");
+                    if (d3.select(this).attr("clicked") == "false") {
+                        d3.select(this).attr("clicked", "true");
+                        d3.select(this).style("stroke", 'blue');
+                        d3.select(this).style('stroke-width',3.5);
+                        console.log("fuck");
+                    } else {
+                        d3.select(this).attr("clicked", "false");
+                        d3.select(this).style('stroke','black');
+                        d3.select(this).style('stroke-width',2);    
+                    }
+                });
+        }
 });
-//    for(i = 0; i < 23; i++){
-//        row = d3.select('#pointsSVG').append("tr:tr");
-//
-//        for(j = 0; j < 4; j++){
-//            cell = row.append("td:td")
-//                .style('horizontal-align', 'middle')
-//                .style('vertical-align', 'middle');
-//
-//            if(i == j){
-//                div = cell.append('div:div')
-//                    //.style('positon', 'relative')
-//                    //.style('top', '50%')
-//                    //.style('transform', 'translateY(-50%)');
-//                    .style('width', '35%')
-//                    .style('margin', '0 auto')
-////                    .style('vertical-align', 'middle')
-//                    .style('font-size', '20px');
-//                
-//                    
-//                div.text(vals[i]);
-//
-//            } else {
-//                
-//                xVal = vals[j];		// Value to plot on x-axis
-//                yVal = vals[i];		// Value to plot on y-axis
-//
-//                // This will define scales that convert values
-//                // from our data domain into screen coordinates.
-//                xScale = d3.scale.linear()
-//                            .domain([d3.min(data, function(d) { return parseFloat(d[xVal]); })-1,
-//                                     d3.max(data, function(d) { return parseFloat(d[xVal]); })+1])
-//                            .range([yOffset + margin , w - margin - 30]);
-//                
-//                yScale = d3.scale.linear()
-//                            .domain([d3.min(data, function(d) { return parseFloat(d[yVal]); })-1,
-//                                     d3.max(data, function(d) { return parseFloat(d[yVal]); })+1])
-//                            .range([h - xOffset - margin, margin + 15]); // Notice this is backwards!
-//
-//                // Next, we will create an SVG element to contain our visualization.
-//                svg = cell.append('svg:svg')
-//                            .attr('width', w)
-//                            .attr('height', h);
-//
-//                // Build axes! (These are kind of annoying, actually...)
-//                if (i == 0) {
-//                    xAxis = d3.svg.axis()
-//                            .scale(xScale)
-//                            .orient('top')
-//                            .innerTickSize(-h - 10)
-//                            .outerTickSize(1)
-//                            .ticks(5);
-//                
-//                    xAxisG = svg.append('g')
-//                            .attr('class', 'axis')
-//                            .attr('transform', 'translate(0,25)')
-//                            .call(xAxis);
-//                } else if (i == 3) {
-//                    xAxis = d3.svg.axis()
-//                            .scale(xScale)
-//                            .orient('bottom')
-//                            .innerTickSize(-h - 10)
-//                            .outerTickSize(1)
-//                            .ticks(5);
-//                
-//                    xAxisG = svg.append('g')
-//                            .attr('class', 'axis')
-//                            .attr('transform', 'translate(0,170)')
-//                            .call(xAxis);
-//                } else {
-//                    xAxis = d3.svg.axis()
-//                            .scale(xScale)
-//                            .orient('bottom')
-//                            .innerTickSize(-h - 10)
-//                            .outerTickSize(1)
-//                            .ticks(5);
-//                
-//                    xAxisG = svg.append('g')
-//                            .attr('class', 'axis')
-//                            .attr('transform', 'translate(0,205)')
-//                            .call(xAxis);
-//                }

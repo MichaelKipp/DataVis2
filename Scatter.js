@@ -44,21 +44,21 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                 div.text(vals[i]);
 
             } else {
-
+                
                 xVal = vals[j];		// Value to plot on x-axis
                 yVal = vals[i];		// Value to plot on y-axis
-
 
                 // This will define scales that convert values
                 // from our data domain into screen coordinates.
                 xScale = d3.scale.linear()
                             .domain([d3.min(data, function(d) { return parseFloat(d[xVal]); })-1,
                                      d3.max(data, function(d) { return parseFloat(d[xVal]); })+1])
-                            .range([yOffset + margin, w - margin]);
+                            .range([yOffset + margin , w - margin - 30]);
+                
                 yScale = d3.scale.linear()
                             .domain([d3.min(data, function(d) { return parseFloat(d[yVal]); })-1,
                                      d3.max(data, function(d) { return parseFloat(d[yVal]); })+1])
-                            .range([h - xOffset - margin, margin]); // Notice this is backwards!
+                            .range([h - xOffset - margin, margin + 15]); // Notice this is backwards!
 
                 // Next, we will create an SVG element to contain our visualization.
                 svg = cell.append('svg:svg')
@@ -66,31 +66,81 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                             .attr('height', h);
 
                 // Build axes! (These are kind of annoying, actually...)
-                xAxis = d3.svg.axis()
+                if (i == 0) {
+                    xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient('top')
+                            .innerTickSize(-h)
+                            .outerTickSize(1)
+                            .ticks(5);
+                
+                    xAxisG = svg.append('g')
+                            .attr('class', 'axis')
+                            .attr('transform', 'translate(0,20)')
+                            .call(xAxis);
+                } else if (i == 3) {
+                    xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient('bottom')
+                            .innerTickSize(-h)
+                            .outerTickSize(1)
                             .ticks(5);
-                xAxisG = svg.append('g')
+                
+                    xAxisG = svg.append('g')
                             .attr('class', 'axis')
-                            .attr('transform', 'translate(0,' + (h - xOffset) + ')')
+                            .attr('transform', 'translate(0,165)')
                             .call(xAxis);
-//                xLabel = svg.append('text')
-//                            .attr('class','label')
-//                            .attr('x', w/2)
-//                            .attr('y', h - 5)
-//                            .text(xVal)
-//                            // Uncomment the following event handler to change xVal by clicking label (and remove above semi-colon)
-//                            .on('click', function() {
-//                                setXval(getNextVal(xVal));
-//                            });
-                yAxis = d3.svg.axis()
+                } else {
+                    xAxis = d3.svg.axis()
+                            .scale(xScale)
+                            .orient('bottom')
+                            .innerTickSize(-h)
+                            .outerTickSize(1)
+                            .ticks(5);
+                
+                    xAxisG = svg.append('g')
+                            .attr('class', 'axis')
+                            .attr('transform', 'translate(0,200)')
+                            .call(xAxis);
+                }
+                
+                
+                
+                
+                if (j == 0) {
+                    yAxis = d3.svg.axis()
                             .scale(yScale)
                             .orient('left')
+                            .innerTickSize(-w)
+                            .outerTickSize(1)
                             .ticks(5);
-                yAxisG = svg.append('g')
+                    yAxisG = svg.append('g')
                             .attr('class', 'axis')
                             .attr('transform', 'translate(' + yOffset + ',0)')
                             .call(yAxis);
+                } else if (j == 3) {
+                    yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient('right')
+                            .innerTickSize(-w)
+                            .outerTickSize(1)
+                            .ticks(5);
+                    yAxisG = svg.append('g')
+                            .attr('class', 'axis')
+                            .attr('transform', 'translate(170,0)')
+                            .call(yAxis);
+                } else {
+                    yAxis = d3.svg.axis()
+                            .scale(yScale)
+                            .orient('right')
+                            .innerTickSize(-w)
+                            .outerTickSize(1)
+                            .ticks(5);
+                    yAxisG = svg.append('g')
+                            .attr('class', 'axis')
+                            .attr('transform', 'translate(200,0)')
+                            .call(yAxis);
+                }
 //                yLabel = svg.append('text')
 //                            .attr('class','label')
 //                            .attr('x', yOffset/2)

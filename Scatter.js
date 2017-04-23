@@ -70,37 +70,37 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                     xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient('top')
-                            .innerTickSize(-h)
+                            .innerTickSize(-h - 10)
                             .outerTickSize(1)
                             .ticks(5);
                 
                     xAxisG = svg.append('g')
                             .attr('class', 'axis')
-                            .attr('transform', 'translate(0,20)')
+                            .attr('transform', 'translate(0,25)')
                             .call(xAxis);
                 } else if (i == 3) {
                     xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient('bottom')
-                            .innerTickSize(-h)
+                            .innerTickSize(-h - 10)
                             .outerTickSize(1)
                             .ticks(5);
                 
                     xAxisG = svg.append('g')
                             .attr('class', 'axis')
-                            .attr('transform', 'translate(0,165)')
+                            .attr('transform', 'translate(0,170)')
                             .call(xAxis);
                 } else {
                     xAxis = d3.svg.axis()
                             .scale(xScale)
                             .orient('bottom')
-                            .innerTickSize(-h)
+                            .innerTickSize(-h - 10)
                             .outerTickSize(1)
                             .ticks(5);
                 
                     xAxisG = svg.append('g')
                             .attr('class', 'axis')
-                            .attr('transform', 'translate(0,200)')
+                            .attr('transform', 'translate(0,205)')
                             .call(xAxis);
                 }
                 
@@ -127,7 +127,7 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                             .ticks(5);
                     yAxisG = svg.append('g')
                             .attr('class', 'axis')
-                            .attr('transform', 'translate(170,0)')
+                            .attr('transform', 'translate(175,0)')
                             .call(yAxis);
                 } else {
                     yAxis = d3.svg.axis()
@@ -138,98 +138,55 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                             .ticks(5);
                     yAxisG = svg.append('g')
                             .attr('class', 'axis')
-                            .attr('transform', 'translate(200,0)')
+                            .attr('transform', 'translate(205,0)')
                             .call(yAxis);
                 }
-//                yLabel = svg.append('text')
-//                            .attr('class','label')
-//                            .attr('x', yOffset/2)
-//                            .attr('y', h/2-10)
-//                            .text(yVal)
-//                            // Uncomment the following event handler to change yVal by clicking label (and remove above semi-colon)
-//                            .on('click', function() {
-//                                setYval(getNextVal(yVal));
-//                            });
-
-                // Now, we will start actually building our scatterplot!
-                // *****************************************************
-                // ************** YOUR CODE WILL GO HERE! **************
-                // *****************************************************
-                    // Select elements
-                var circle = svg.selectAll('circle')
+                
+                
+                var clicked = new Array(23);
+                
+                var circle = cell.select('svg').selectAll('circle')
                     .data(data);
                 circle.enter()
                     .append('svg:circle')
                     .attr('cx', function(d) {return xScale(d[xVal]);})
                     .attr('cy', function(d) {return yScale(d[yVal]);})
                     .attr('r', 0)
+                    .attr('class', function(d) { return "a" + d['Flight Index'];})
                     .style('fill', '#000000')
                     .on('mouseover', function(d) {
-                        d3.select(this).append('svg:title')
-                        .style('font-size', '50px')
-                        .style('color', '#fff000')
-                        .text(function(d){return d['Word'];});
+                        
+                        circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
+                        circ.style('fill','red');
+                        circ.attr('r',4);
+                    })
+                    .on('mouseout', function(d) {
+                        circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
+                        circ.style('fill','black');
+                        circ.attr('r',2.5);
+                        if (clicked[d['Flight Index']] == 1) {
+                            circ.style('fill','#FFF000');
+                            circ.attr('r',4);
+                        }
                     })
                     .transition().duration(1000)
-                    .attr('r', 2);
-
-                    // Bind data to elements
-
-                    // Create new elements if needed
-
-                    // Update our selection
-                        // Give it a class
-                        // x-coordinate
-                        // y-coordinate
-                        // radius
-                        // color
-                        // tooltip?
-
-                // A function to retrieve the next value in the vals list
-                function getNextVal(val) {
-                    return vals[(vals.indexOf(val) + 1) % vals.length];
-                }
-
-                // A function to change what values we plot on the x-axis
-                function setXval(val) {
-                    // Update xVal
-                    var showingFrequency = true;
-                    xVal = val;
-
-                    // Update the axis
-                    xScale.domain([d3.min(data, function(d) { return parseFloat(d[xVal]); })-1,
-                                   d3.max(data, function(d) { return parseFloat(d[xVal]); })+1])
-                    xAxis.scale(xScale);
-                    xAxisG.call(xAxis);
-                    xLabel.text(xVal);
-
-                    var circle = svg.selectAll('circle')
-                        .attr('cy', function(d) {return yScale(d[xVal]);})
-                        .attr('r', 0)
-                        .style('fill', '#000000')
-                        .transition().duration(1000)
-                        .attr('r', 4);
-                }
-
-                // A function to change what values we plot on the y-axis
-                function setYval(val) {
-                    // Update yVal
-                    yVal = val;
-
-                    // Update the axis
-                    yScale.domain([d3.min(data, function(d) { return parseFloat(d[yVal]); })-1,
-                                   d3.max(data, function(d) { return parseFloat(d[yVal]); })+1])
-                    yAxis.scale(yScale);
-                    yAxisG.call(yAxis);
-                    yLabel.text(yVal);
-
-                    var circle = svg.selectAll('circle')
-                        .attr('cy', function(d) {return yScale(d[yVal]);})
-                        .attr('r', 0)
-                        .style('fill', '#000000')
-                        .transition().duration(1000)
-                        .attr('r', 4);
-                }
+                    .attr('r', 2.5);
+                    circle.append('svg:title')
+                            .text(function(d){return "" + d[xVal] + ", " + d[yVal];})
+                    
+                    circle.on('click', function(d) {
+                        if (clicked[d['Flight Index']] == 1) {
+                            clicked[d['Flight Index']] = 0;
+                            circ.style('fill','black');
+                            circ.attr('r',2.5);
+                        } else {
+                            clicked[d['Flight Index']] = 1;
+                            circ.style('fill','#FFF000');
+                            circ.attr('r',4);
+                            console.log("booped");
+                        }
+        
+                    });
             }
         }
     }

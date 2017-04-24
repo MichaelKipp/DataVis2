@@ -155,7 +155,6 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                     .attr('class', function(d) { return "a" + d['Flight Index'];})
                     .style('fill', '#000000')
                     .on('mouseover', function(d) {
-                        
                         circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
                         circ.style('fill','red');
                         circ.attr('r',4);

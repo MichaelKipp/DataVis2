@@ -10,7 +10,7 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
 d3.csv('challenger.csv', function(csvData) {
     data = csvData;
     
-    svg = d3.select('#pointsSVG').append('svg:svg')
+    svg = d3.select('#parSVG').append('svg:svg')
         .attr('width', w)
         .attr('height', h);
     
@@ -85,18 +85,35 @@ d3.csv('challenger.csv', function(csvData) {
                 .attr('stroke-opacity', .5)
                 .attr("stroke-width", 2)
                 .attr("fill", "none")
-                .on('click', function(d) {
-                    console.log("boop");
-                    if (d3.select(this).attr("clicked") == "false") {
-                        d3.select(this).attr("clicked", "true");
-                        d3.select(this).style("stroke", 'blue');
-                        d3.select(this).style('stroke-width',3.5);
-                        console.log("fuck");
-                    } else {
-                        d3.select(this).attr("clicked", "false");
-                        d3.select(this).style('stroke','black');
-                        d3.select(this).style('stroke-width',2);    
-                    }
-                });
+            
+            .on('mouseover', function(d) {
+                d3.select(this).style("stroke", 'red');
+                d3.select(this).style('stroke-width',5);
+            })
+            
+            .on('mouseout', function(d) {
+                d3.select(this).style("stroke", 'black');
+                d3.select(this).style("stroke-width", 2);
+                if (d3.select(this).attr("clicked") == "true") {
+                    d3.select(this).style("stroke", 'blue');
+                    d3.select(this).style('stroke-width',3.5);
+                }
+            })
+            .on('click', function(d) {
+                if (d3.select(this).attr("clicked") == "false") {
+                    d3.select(this).attr("clicked", "true");
+                    d3.select(this).style("stroke", 'blue');
+                    d3.select(this).style('stroke-width',3.5);
+                } else {
+                    d3.select(this).attr("clicked", "false");
+                    d3.select(this).style('stroke','black');
+                    d3.select(this).style('stroke-width',2);    
+                }
+            
+               });
         }
+    
+        function getNextVal(val) {
+	       return vals[(vals.indexOf(val) + 1) % vals.length];
+}
 });

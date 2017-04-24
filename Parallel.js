@@ -1,76 +1,101 @@
-w = 1000;			// Width of our visualization
-h = 500;			// Height of our visualization
-xOffset = 40;		// Space for x-axis labels
-spacing = 300;		// Space for y-axis labels
-margin = 10;		// Margin around visualization
+Pw = 1000;			// Width of our visualization
+Ph = 500;			// Height of our visualization
+PxOffset = 40;		// Space for x-axis labels
+Pspacing = 300;		// Space for y-axis labels
+Pmargin = 10;		// Margin around visualization
+var clicked = new Array(23);
 
-vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
+Pvals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
 
 // Next, we will load in our CSV of data
 d3.csv('challenger.csv', function(csvData) {
     data = csvData;
     
-    svg = d3.select('#parSVG').append('svg:svg')
-        .attr('width', w)
-        .attr('height', h);
+    Psvg = d3.select('#parSVG').append('svg:svg')
+        .attr('width', Pw)
+        .attr('height', Ph);
     
     for (i = 0; i < 4; i++) {
-        yVal = vals[i];
+        PyVal = Pvals[i];
         
-         yScale = d3.scale.linear()
-             .domain([d3.min(data, function(d) { return parseFloat(d[yVal]); })-1,
-						 d3.max(data, function(d) { return parseFloat(d[yVal]); })+1])
-             .range([h - xOffset - margin, margin]);
+         PyScale = d3.scale.linear()
+             .domain([d3.min(data, function(d) { return parseFloat(d[PyVal]); })-1,
+						 d3.max(data, function(d) { return parseFloat(d[PyVal]); })+1])
+             .range([Ph - PxOffset - Pmargin, Pmargin]);
         
-        yAxis = d3.svg.axis()
-            .scale(yScale)
+        PyAxis = d3.svg.axis()
+            .scale(PyScale)
             .orient('left')
             .innerTickSize(0)
             .outerTickSize(0)
             .ticks(5);
 
-        yAxisG = svg.append('g')
+        PyAxisG = Psvg.append('g')
             .attr('class', 'axis')
-            .attr('transform', 'translate(' + (50 + (spacing * i)) + ',0)')
-            .call(yAxis);
+            .attr('transform', 'translate(' + (50 + (Pspacing * i)) + ',0)')
+            .call(PyAxis);
         
-        yLabel = svg.append('text')
+        PyLabel = Psvg.append('text')
             .attr('class','label')
-            .attr('x', 50 + spacing * i)
-            .attr('y', h - 10)
-            .text(vals[i]);
+            .attr('x', 50 + Pspacing * i)
+            .attr('y', Ph - 10)
+            .text(Pvals[i]);
         }
     
-        var circle = svg.selectAll('circle')
+        var circle = Psvg.selectAll('circle')
             .data(data);
         for (j = 0; j < 4; j++){
             
-            yyVal = vals[j];
+            yPyVal = Pvals[j];
             
-            yScale = d3.scale.linear()
-                .domain([d3.min(data, function(d) { return parseFloat(d[yyVal]); })-1,
-						 d3.max(data, function(d) { return parseFloat(d[yyVal]); })+1])
-				.range([h - xOffset - margin, margin]);
+            PyScale = d3.scale.linear()
+                .domain([d3.min(data, function(d) { return parseFloat(d[yPyVal]); })-1,
+						 d3.max(data, function(d) { return parseFloat(d[yPyVal]); })+1])
+				.range([Ph - PxOffset - Pmargin, Pmargin]);
             
             circle.enter()
             .append('svg:circle')
-            .attr('cy', function(d) {return yScale(d[yyVal]);})
-            .attr('cx', function(d) {return 50 + spacing * j;})
-            .attr('r', 0)
+            .attr('cy', function(d) {return PyScale(d[yPyVal]);})
+            .attr('cx', function(d) {return 50 + Pspacing * j;})
+            .attr('r', 2)
             .attr('class', function(d) { return "a" + d['Flight Index'];})
-            .style('fill', '#000000');
-        }
+            .style('fill', '#000000')
+            .on('mouseover', function(d) {
+                        circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
+                        circ.style('fill','red');
+                        circ.attr('r',4);
+                    })
+            .on('mouseout', function(d) {
+                        circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
+                        circ.style('fill','black');
+                        circ.attr('r',2.5);
+                        if (clicked[d['Flight Index']] == 1) {
+                            circ.style('fill','#FFF000');
+                            circ.attr('r',4);
+                        }
+                    })
+            circle.on('click', function(d) {
+                        if (clicked[d['Flight Index']] == 1) {
+                            clicked[d['Flight Index']] = 0;
+                            circ.style('fill','black');
+                            circ.attr('r',2.5);
+                        } else {
+                            clicked[d['Flight Index']] = 1;
+                            circ.style('fill','#FFF000');
+                            circ.attr('r',4);
+                        }
+        });
+    }
         
         var lineFunction = d3.svg.line()
             .x(function(d) { return d.x; })
             .y(function(d) { return d.y; })
             .interpolate("linear");
            
-        var clicked = new Array(23);
+
     
         for (j = 1; j < 24; j ++) {
             circ = d3.selectAll('circle').filter('.a' + j);
-            console.log(circ);
             carr = circ.pop();
             var points = new Array(4);
             
@@ -78,20 +103,22 @@ d3.csv('challenger.csv', function(csvData) {
                 points[i] = { "x": carr[i].getAttribute('cx'), "y": carr[i].getAttribute('cy')};
             }
             
-            var lineGraph = svg.append("path")
+            var lineGraph = Psvg.append("path")
                 .attr("d", lineFunction(points))
                 .attr("clicked", "false")
                 .attr("stroke", 'black')
                 .attr('stroke-opacity', .5)
                 .attr("stroke-width", 2)
                 .attr("fill", "none")
+                .attr("class", '.a' + j)
+
             
-            .on('mouseover', function(d) {
+            .on('mouseover', function() {
                 d3.select(this).style("stroke", 'red');
                 d3.select(this).style('stroke-width',5);
             })
             
-            .on('mouseout', function(d) {
+            .on('mouseout', function() {
                 d3.select(this).style("stroke", 'black');
                 d3.select(this).style("stroke-width", 2);
                 if (d3.select(this).attr("clicked") == "true") {
@@ -99,7 +126,7 @@ d3.csv('challenger.csv', function(csvData) {
                     d3.select(this).style('stroke-width',3.5);
                 }
             })
-            .on('click', function(d) {
+            .on('click', function() {
                 if (d3.select(this).attr("clicked") == "false") {
                     d3.select(this).attr("clicked", "true");
                     d3.select(this).style("stroke", 'blue');
@@ -111,9 +138,14 @@ d3.csv('challenger.csv', function(csvData) {
                 }
             
                });
+            
+            lineGraph.append('svg:title')
+                    .text("FI: " + data[j - 1]['Flight Index'] + ", ORD: " + data[j - 1]['O Ring Distress'] + ", LT: " + data[j - 1]['Launch Temp'] + ", LP: " +  data[j - 1]['Leak Pressure'])
         }
     
+        lgraps = d3.selectAll('path');
+    
         function getNextVal(val) {
-	       return vals[(vals.indexOf(val) + 1) % vals.length];
+	       return Pvals[(Pvals.indexOf(val) + 1) % Pvals.length];
 }
 });

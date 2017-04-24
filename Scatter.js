@@ -143,7 +143,6 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                 }
                 
                 
-                var clicked = new Array(23);
                 
                 var circle = cell.select('svg').selectAll('circle')
                     .data(data);
@@ -155,12 +154,16 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                     .attr('class', function(d) { return "a" + d['Flight Index'];})
                     .style('fill', '#000000')
                     .on('mouseover', function(d) {
-                        circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
+                        circ = d3.selectAll('.a' + d['Flight Index']);
+                        pa = d3.selectAll('path').filter('.a' + d['Flight Index']);
                         circ.style('fill','red');
                         circ.attr('r',4);
+                        pa.attr("stroke", 'red');
+                        pa.attr('stroke-width',5);
+                        
                     })
                     .on('mouseout', function(d) {
-                        circ = d3.selectAll('circle').filter('.a' + d['Flight Index']);
+                        circ = d3.selectAll('.a' + d['Flight Index']);
                         circ.style('fill','black');
                         circ.attr('r',2.5);
                         if (clicked[d['Flight Index']] == 1) {
@@ -182,7 +185,6 @@ vals = ['Flight Index','O Ring Distress','Launch Temp','Leak Pressure'];
                             clicked[d['Flight Index']] = 1;
                             circ.style('fill','#FFF000');
                             circ.attr('r',4);
-                            console.log("booped");
                         }
         
                     });
